@@ -31,6 +31,7 @@ class MessageRepository extends ServiceEntityRepository
     {
         $status = $request->query->get('status');
 
+        //Swapped query from entity manager with findBy method since it is built in already and better to use.
         if ($status) {
             $messages = $this->findBy(
                 ['status' => $status]

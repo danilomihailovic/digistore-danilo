@@ -5,7 +5,6 @@ namespace App\Controller;
 
 use App\Message\SendMessage;
 use App\Repository\MessageRepository;
-use Controller\MessageControllerTest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,11 +16,6 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @see MessageControllerTest
- * TODO: review both methods and also the `openapi.yaml` specification
- *       Add Comments for your Code-Review, so that the developer can understand why changes are needed.
- */
 class MessageController extends AbstractController
 {
 
@@ -34,10 +28,8 @@ class MessageController extends AbstractController
         private readonly MessageBusInterface $messageBus
     ) {
     }
+    //Added constructor so that DI is handled in constructor and not through the method parameters.
 
-    /**
-     * TODO: cover this method with tests, and refactor the code (including other files that need to be refactored)
-     */
     #[Route('/messages', methods: ['GET'])]
     public function list(Request $request): Response
     {
@@ -57,7 +49,7 @@ class MessageController extends AbstractController
 
         $json = $serializer->serialize($messages, 'json');
 
-        //TODO add handling if the result is null(no messages)
+        //Added JSON serializer instead of using PHP method for json encoding.
 
         return new Response($json, headers: ['Content-Type' => 'application/json']);
     }
@@ -73,7 +65,9 @@ class MessageController extends AbstractController
         $errors = $validator->validate(
             $text,
             [
-                new Assert\NotBlank(),
+                new Assert\NotBlank(
+                    message: 'Text is required'
+                ),
                 new Assert\Regex(
                     pattern: '/[^a-z0-9\s\.\-\?\+\,]/i',
                     message: 'Your text cannot contain special characters',
@@ -93,5 +87,6 @@ class MessageController extends AbstractController
         $this->messageBus->dispatch(new SendMessage((string)$text));
 
         return new Response('Successfully sent', 200);
+        //Changed status so that response can be rendered.
     }
 }
